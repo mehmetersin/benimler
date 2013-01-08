@@ -1,5 +1,7 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
 <head profile="http://gmpg.org/xfn/11">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -8,6 +10,8 @@
 <meta name="author" content="author" />
 <title>benimLerr: (beta)</title>
 
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 
 <link rel="stylesheet" href="css/style.css" type="text/css"
 	media="screen" />
@@ -30,6 +34,10 @@
 			<ul>
 				<li><a href="#">Nedir bu benimLe !</a></li>
 			</ul>
+			<ul>
+				<c:url value="/postbenimle" var="somevar" />
+				<li><a href="${somevar}">Seninle Olanı Benimle</a></li>
+			</ul>
 			<div class="clearer"></div>
 		</div>
 		<div id="main">
@@ -37,12 +45,16 @@
 			<div class="left" id="main_left">
 
 				<div class="content">
-					<form method="get" id="searchform" action="#">
+
+					<form:form method="POST" modelAttribute="searchText"
+						action="/benimler/searchbenimle">
+
 						<div>
-							<input type="text" value="" name="s" id="s" /> <input
-								type="submit" id="searchsubmit" value="Search" class="submit" />
+							<form:input path="text" />
+							<input type="submit" id="searchsubmit" value="Search"
+								class="submit" />
 						</div>
-					</form>
+					</form:form>
 				</div>
 
 				<c:forEach items="${benims}" var="benimItem">
@@ -56,7 +68,7 @@
 										<img src="img/shopping.png" alt="Sample Image" height="20"
 											width="20" class="left" /> <a href="#"><c:out
 												value="${benimItem.user.name}" /></a> posted a benimLe in
-										<c:out value="${benimItem.categoryId}" />
+										<c:out value="${benimItem.category.displayText}" />
 									</p>
 									<img
 										src="http://graph.facebook.com/<c:out value="${benimItem.userId}"/>/picture"
@@ -71,29 +83,39 @@
 									<div class="left">
 										<span class="comment">
 											<div class="left">
-												<span class=""><a href="#">4 Comments</a></span>
+												<span class=""><a href="#">Comments</a></span>
 											</div>
 											<table>
-												<tr>
-													<td><img
-														src="http://graph.facebook.com/<c:out value="${benimItem.id}"/>/picture"
-														alt="Sample Image" height="30" width="30" class="" /></td>
-													<td><a href="http://goo.gl/eD8CB"><c:out
-																value="${benimItem.url}" /></a> Deneme Olsun</td>
-												</tr>
 
+												<c:forEach items="${benimItem.comments}" var="ci">
+
+													<tr>
+														<td><img
+															src="http://graph.facebook.com/<c:out value="${ci.userId}"/>/picture"
+															alt="Sample Image" height="30" width="30" class="" /></td>
+														<td><c:out value="${ci.text}" /></td>
+													</tr>
+												</c:forEach>
 											</table>
 											<table>
 												<tr>
 													<td>
 														<div class="content">
-															<form method="get" id="searchform" action="#">
+
+
+
+															<form:form method="POST" modelAttribute="searchText"
+																action="/benimler/commentbenimle">
+
 																<div>
-																	<input type="text" value="" name="s" id="s" /> <input
-																		type="submit" id="searchsubmit" value="Yorumla"
-																		class="submit" />
+																	<form:input path="text" />
+																	<input id="id" name="id" type="hidden"
+																		value="${benimItem.id}" /> <input type="submit"
+																		id="commentsubmit" value="Yorumla" class="submit" />
 																</div>
-															</form>
+															</form:form>
+
+
 														</div>
 													</td>
 												</tr>

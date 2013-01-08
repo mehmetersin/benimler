@@ -9,8 +9,8 @@
 	<context:property-placeholder properties-ref="defaultProperties" />
 	
 	<util:properties id="defaultProperties">
-		<prop key="facebook.clientId">178352068866467</prop>
-		<prop key="facebook.clientSecret">41009bf992e9deace73d5d503961c547</prop>
+		<prop key="facebook.clientId">407593439318747</prop>
+		<prop key="facebook.clientSecret">911e28a01e06a505734d2f486656c918</prop>
 	</util:properties>
 	
 </beans>

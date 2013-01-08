@@ -7,8 +7,13 @@
 	<!-- Controls rendering of the home page once a user has signed in -->
 	<bean class="com.mesoft.webapp.benimler.HomeController">
 		<constructor-arg ref="facebook" />
+		<property name="dbOperations" ref="dbOperations" />
+	</bean>
+
+	<bean id="dbOperations" class="com.mesoft.webapp.benimler.DbOperations">
 		<property name="benimlerDs" ref="benimlerDs" />
 	</bean>
+
 
 	<!-- Allows users to sign-in with their provider accounts. -->
 	<bean class="org.springframework.social.connect.web.ProviderSignInController">
@@ -22,5 +27,8 @@
 	<mvc:view-controller path="/signin" />
 
 	<mvc:view-controller path="/signout" />
+	
+	<mvc:view-controller path="/postbenimle" />
+	
 
 </beans>
