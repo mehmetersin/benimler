@@ -30,7 +30,7 @@ final class UserCookieGenerator {
 	private final CookieGenerator userCookieGenerator = new CookieGenerator();
 
 	public UserCookieGenerator() {
-		userCookieGenerator.setCookieName("quickstart_user");
+		userCookieGenerator.setCookieName("benimler_user");
 	}
 
 	public void addCookie(String userId, HttpServletResponse response) {

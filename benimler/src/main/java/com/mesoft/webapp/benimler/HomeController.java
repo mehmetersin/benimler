@@ -15,22 +15,30 @@
  */
 package com.mesoft.webapp.benimler;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.FacebookProfile;
-import org.springframework.social.facebook.api.Reference;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.mesoft.webapp.benimler.om.Benimle;
-import com.mesoft.webapp.benimler.om.BenimleRM;
+import com.mesoft.webapp.benimler.om.Comment;
+import com.mesoft.webapp.benimler.view.BenimleForm;
+import com.mesoft.webapp.benimler.view.BenimleView;
 
 /**
  * Simple little @Controller that invokes Facebook and renders the result. The
@@ -49,30 +57,132 @@ public class HomeController {
 		this.facebook = facebook;
 	}
 
-	private JdbcTemplate selectTemplate;
+	private DbOperations dbOperations;
 
-	public void setBenimlerDs(DataSource benimlerDs) {
-		selectTemplate = new JdbcTemplate(benimlerDs);
+	public DbOperations getDbOperations() {
+		return dbOperations;
 	}
 
-	public java.util.List queryBenimler() {
-		return (java.util.List) selectTemplate.query("select * from benims",
-				new Object[] {}, new BenimleRM());
+	public void setDbOperations(DbOperations dbOperations) {
+		this.dbOperations = dbOperations;
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String home(Model model) {
+	public String home(Model model,
+			@ModelAttribute("searchText") BenimleForm searchForm) {
 
-		List<Benimle> list = queryBenimler();
+		createFavoriteBenimler(model, searchForm);
+
+		return "home";
+	}
+
+	private void createFavoriteBenimler(Model model, BenimleForm searchForm) {
+		List<Benimle> list = getDbOperations().qetFavoriteBenimler();
 		for (Benimle benimle : list) {
 			FacebookProfile prof = facebook.userOperations().getUserProfile(
 					benimle.getUserId());
 			benimle.setUser(prof);
+			benimle.setCategory(dbOperations.getCategoryById(benimle
+					.getCategoryId()));
+			benimle.setComments(dbOperations.qetCommentsByBenimleId(benimle
+					.getId()));
 		}
 
+		
+		
 		model.addAttribute("benims", list);
 
+		searchForm = new BenimleForm();
+		searchForm.setText("Ara birşeyler");
+		model.addAttribute(searchForm);
+
+	}
+
+	@RequestMapping(value = "/postbenimle", method = RequestMethod.GET)
+	public ModelAndView postbenimle() {
+		return new ModelAndView("postbenimle", "command", new BenimleView());
+	}
+
+	@RequestMapping(value = "/searchbenimle", method = RequestMethod.POST)
+	public String searchbenimle(Model model,
+			@ModelAttribute("searchText") BenimleForm searchForm) {
+
+		List<Benimle> list = dbOperations.queryBenimler(searchForm.getText());
+		
+		model.addAttribute("benims", list);
+
+		searchForm = new BenimleForm();
+		searchForm.setText("Ara birşeyler");
+		model.addAttribute(searchForm);
 		
 		return "home";
 	}
+	
+	@RequestMapping(value = "/commentbenimle", method = RequestMethod.POST)
+	public String commentbenimle(Model model,
+			@ModelAttribute("searchText") BenimleForm searchForm) {
+
+		Comment c = new Comment();
+		c.setText(searchForm.getText());
+		c.setUserId(facebook.userOperations().getUserProfile().getId());
+		c.setBenimleId(searchForm.getId());
+		
+		dbOperations.insertComment(c);
+		
+		
+		createFavoriteBenimler(model, searchForm);
+		
+		return "home";
+	}
+
+	@RequestMapping(value = "/postingbenimle", method = RequestMethod.POST)
+	public String postingbenimle(Model model,
+			@ModelAttribute("postbenimle") BenimleView bw,
+			@ModelAttribute("searchText") BenimleForm searchForm) {
+
+		Benimle b = new Benimle();
+		// b.setCategoryId( bw.getCategory())
+		b.setDescription(bw.getDescription());
+		b.setTitle(bw.getTitle());
+		b.setTimestamp(new Date());
+		b.setUrl(bw.getUrl());
+		b.setCategoryId(dbOperations.getCategoryByDisplayname(bw.getCategory())
+				.getDetailCategoryId());
+
+		b.setUserId(facebook.userOperations().getUserProfile().getId());
+
+		int a = dbOperations.insertBenimle(b);
+
+		MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+		map.set("link", b.getUrl());
+		map.set("name", b.getTitle());
+		// map.set("caption", b.get);
+		// map.set("description", b.getDescription());
+		map.set("message", b.getDescription());
+
+		// THE BELOW LINES ARE THE CRITICAL PART I WAS LOOKING AT!
+		map.set("picture",
+				"http://icons.iconarchive.com/icons/petalart/christmas-cookie/icons-390.jpg");
+		// map.set("actions",
+		// "{'name':'myAction', 'link':'http://www.bla.com/action'}");
+
+		String c = facebook.publish(facebook.userOperations().getUserProfile()
+				.getId(), "feed", map);
+
+		System.out.println("Action id" + c);
+
+		createFavoriteBenimler(model, searchForm);
+
+		return "home";
+	}
+
+	@RequestMapping(value = "/get_category_list.html", method = RequestMethod.GET, headers = "Accept=*/*")
+	public @ResponseBody
+	List<String> getCountryList(@RequestParam("term") String query,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		return dbOperations.queryCategory(query);
+
+	}
+
 }

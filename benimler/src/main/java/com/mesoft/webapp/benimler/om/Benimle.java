@@ -1,5 +1,9 @@
 package com.mesoft.webapp.benimler.om;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.social.facebook.api.FacebookProfile;
 
 public class Benimle {
@@ -11,8 +15,29 @@ public class Benimle {
 	private String title;
 	private String description;
 	private String url;
+	private Date timestamp;
+
+	private List<Comment> comments = new ArrayList<Comment>();
 
 	private FacebookProfile user;
+
+	private Category category;
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
 
 	public FacebookProfile getUser() {
 		return user;
@@ -68,6 +93,21 @@ public class Benimle {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public String toString() {
+		return "[id]" + id + "[userId]" + userId + "[categoryId]" + categoryId
+				+ "[title]" + title + "[description]" + description + "[url]"
+				+ url;
+
 	}
 
 }
