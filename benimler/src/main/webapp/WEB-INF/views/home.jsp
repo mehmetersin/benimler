@@ -1,177 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
-<head profile="http://gmpg.org/xfn/11">
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="description" content="description" />
-<meta name="keywords" content="keywords" />
-<meta name="author" content="author" />
-<title>benimLerr: (beta)</title>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+
+<title>AdviceShip</title>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
-<link rel="stylesheet" href="css/style.css" type="text/css"
-	media="screen" />
+<meta http-equiv="content-type"
+	content="application/xhtml+xml; charset=UTF-8" />
+<meta name="description" content="Site Description Here" />
+<meta name="keywords" content="keywords, here" />
+<meta name="robots" content="index, follow, noarchive" />
+<meta name="googlebot" content="noarchive" />
+
+<link rel="stylesheet" type="text/css" media="screen"
+	href="css/screen.css" />
 
 </head>
+
 <body>
-	<div id="container">
-		<div id="top">
-			<div class="left">
-				<h1 id="site_title">
-					<img src="img/shopping.png" alt="Sample Image" height="40"
-						width="40" class="left" /> benimLer
-				</h1>
-				<div id="site_description">Seninle olanlar...</div>
+
+	<!-- wrap starts here -->
+	<div id="wrap">
+
+		<!--header -->
+		<div id="header">
+			<h1 id="logo-text">
+				<a href="http://www.adviceship.com" title="">adviceship</a>
+			</h1>
+			<p id="slogan">Advice Friendship...</p>
+			<div id="nav">
+				<ul>
+					<li class="first"><a href="http://www.adviceship.com">Home</a></li>
+					<li><a href="style.html">Share Advice</a></li>
+					<li><a href="archives.html">Help</a></li>
+
+					<li><a href="http://www.adviceship.com">About</a></li>
+				</ul>
 			</div>
-			<a href="#" class="button feed right"><span></span></a>
-			<div class="clearer"></div>
+			<div id="header-image"></div>
+			<!--header ends-->
 		</div>
-		<div class="path" id="nav">
-			<ul>
-				<li><a href="#">Nedir bu benimLe !</a></li>
-			</ul>
-			<ul>
-				<c:url value="/postbenimle" var="somevar" />
-				<li><a href="${somevar}">Seninle Olanı Benimle</a></li>
-			</ul>
-			<div class="clearer"></div>
-		</div>
-		<div id="main">
-			<div class="inner_copy"></div>
-			<div class="left" id="main_left">
 
-				<div class="content">
+		<!-- content -->
+		<div id="content-outer" class="clear">
+			<div id="content-wrap">
+				<div id="content">
+					<div id="left">
 
-					<form:form method="POST" modelAttribute="searchText"
-						action="/benimler/searchbenimle">
+						<form:form method="POST" modelAttribute="searchText"
+							id="quick-search" action="/benimler/searchbenimle">
 
-						<div>
-							<form:input path="text" />
-							<input type="submit" id="searchsubmit" value="Search"
-								class="submit" />
-						</div>
-					</form:form>
-				</div>
 
-				<c:forEach items="${benims}" var="benimItem">
+							<p>
+								<label for="qsearch">Search:</label>
+								<form:input path="text" value="Search advices..." class="tbox" />
 
-					<div id="splash">
-						<div class="container">
-							<div class="post">
+								<input type="image" src="img/search.gif" title="Search"
+									name="searchsubmit" alt="Search" class="submit">
+							</p>
 
-								<div class="body">
-									<p>
-										<img src="img/shopping.png" alt="Sample Image" height="20"
-											width="20" class="left" /> <a href="#"><c:out
-												value="${benimItem.user.name}" /></a> posted a benimLe in
-										<c:out value="${benimItem.category.displayText}" />
-									</p>
-									<img
-										src="http://graph.facebook.com/<c:out value="${benimItem.userId}"/>/picture"
-										alt="Sample Image" height="60" width="60" class="left" />
-									<p>
-										<c:out value="${benimItem.title}" />
-										<c:out value="${benimItem.description}" />
-									</p>
+						</form:form>
 
-								</div>
-								<div class="metadata">
-									<div class="left">
-										<span class="comment">
-											<div class="left">
-												<span class=""><a href="#">Comments</a></span>
-											</div>
-											<table>
 
-												<c:forEach items="${benimItem.comments}" var="ci">
 
-													<tr>
-														<td><img
-															src="http://graph.facebook.com/<c:out value="${ci.userId}"/>/picture"
-															alt="Sample Image" height="30" width="30" class="" /></td>
-														<td><c:out value="${ci.text}" /></td>
-													</tr>
-												</c:forEach>
-											</table>
-											<table>
+						<div class="post no-bg">
+
+							<c:forEach items="${benims}" var="benimItem">
+
+
+								<ol class="commentlist">
+									<li class="alt" id="comment-63"><cite> <img alt=""
+											src="http://graph.facebook.com/<c:out value="${benimItem.userId}"/>/picture"
+											class="avatar" height="40" width="40" /> <a
+											href="http://www.adviceship.com">${benimItem.user.name}</a>
+											share an advice in <br /> <span class="comment-data">${benimItem.category.displayText}
+										</span> <br /> <span class="comment-data"><c:out
+													value="${benimItem.timestamp}" /> </span>
+									</cite>
+										<div class="comment-text">
+											<p>
+												<c:out value="${benimItem.title}" />
+												<c:out value="${benimItem.description}" />
+											</p>
+										</div></li>
+									<table>
+										<tbody>
+											<tr>
+												<th><strong>Comments</strong></th>
+
+											</tr>
+											<tr>
+												<td><form:form method="POST"
+														modelAttribute="searchText"
+														action="/benimler/commentbenimle">
+
+														<div>
+															<form:input id="commentText"  value="Comment advice..." path="text" />
+															<input id="id" name="id" type="hidden"
+																value="${benimItem.id}" /> <input type="submit"
+																id="commentsubmit" value="Comment" class="button" />
+														</div>
+													</form:form></td>
+											</tr>
+
+											<c:forEach items="${benimItem.comments}" var="ci">
+
 												<tr>
 													<td>
-														<div class="content">
+														<li id="comment-67"><cite> <img alt=""
+																src="http://graph.facebook.com/<c:out value="${ci.userId}"/>/picture"
+																class="avatar" height="40" width="40" /> <c:out
+																	value="${ci.username}" /> Says: <br /> <span
+																class="comment-data"> </span>
 
-
-
-															<form:form method="POST" modelAttribute="searchText"
-																action="/benimler/commentbenimle">
-
-																<div>
-																	<form:input path="text" />
-																	<input id="id" name="id" type="hidden"
-																		value="${benimItem.id}" /> <input type="submit"
-																		id="commentsubmit" value="Yorumla" class="submit" />
+																<div class="comment-text">
+																	<p>
+																		<c:out value="${ci.text}" />
+																	</p>
 																</div>
-															</form:form>
-
-
-														</div>
+														</cite></li>
 													</td>
 												</tr>
-											</table>
 
+											</c:forEach>
 
-										</span>
+										</tbody>
+									</table>
+									<div class="entry">
+										<p></p>
 									</div>
+								</ol>
 
-
-									<div class="clearer"></div>
-								</div>
-							</div>
+							</c:forEach>
 						</div>
 					</div>
+					<div id="right">
+						<div class="sidemenu">
+							<h3>Last Advices</h3>
 
+							<ul>
 
-				</c:forEach>
+								<c:forEach items="${favBenimle}" var="favBenimle">
 
+									<li><a href="http://www.adviceship.com"> <c:out
+												value="${favBenimle.user.name} advice in ${favBenimle.title}" /></a></li>
 
+								</c:forEach>
 
+							</ul>
 
+						</div>
+
+						<div class="sidemenu">
+							<h3>Last Comments</h3>
+
+							<ul>
+
+								<c:forEach items="${favCommentList}" var="favComment">
+
+									<li><a href="http://www.adviceship.com"> <c:out
+												value="${favComment.username} says: ${favComment.text}" /></a></li>
+								</c:forEach>
+							</ul>
+
+						</div>
+
+						<div class="sidemenu">
+							<h3>Advice Categories</h3>
+							<ul>
+
+								<c:forEach items="${favCategoryList}" var="favCategory">
+
+									<li><a href="http://www.adviceship.com"><c:out
+												value="${favCategory.displayText}" /></a></li>
+
+								</c:forEach>
+
+							</ul>
+						</div>
+					</div>
+				</div>
+				<!-- content end -->
 			</div>
-			<div class="right" id="main_right">
-				<div id="sidebar">
 
-					<h2>Categories</h2>
-					<ul class="content">
-						<li><a href="#">Single Column</a> (5)</li>
-						<li><a href="#">Three Columns</a> (2)</li>
-						<li><a href="#">Two Columns</a> (13)</li>
-					</ul>
+		</div>
 
+		<!-- footer starts here -->
+		<div id="footer-outer" class="clear">
+			<div id="footer-wrap">
+				<div class="col-a">
+					<h3>Home</h3>
+					<p>Home</p>
+					<div class="footer-list">
+						<ul>
+							<li><a href="http://www.adviceship.com">Home</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-a">
+					<h3>Share Advice</h3>
+					<p>Share Advice</p>
+					<div class="footer-list">
+						<ul>
+							<li><a href="http://www.adviceship.com">Share Advice</a></li>
+						</ul>
+						<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+						<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+
+<title>Fresh Pick</title>
+
+<meta http-equiv="content-type"
+	content="application/xhtml+xml; charset=UTF-8" />
+<meta name="author" content="root" />
+<meta name="description" content="Site Description Here" />
+<meta name="keywords" content="keywords, here" />
+<meta name="robots" content="index, follow, noarchive" />
+<meta name="googlebot" content="noarchive" />
+
+<link rel="stylesheet" type="text/css" media="screen"
+	href="css/screen.css" />
+
+</head>
+
+
+						</html>
+
+					</div>
+				</div>
+				<div class="col-b">
+					<h3>About</h3>
+					<p>Mehmet Ersin Bitirgen</p>
 
 				</div>
+				<!-- footer ends -->
 			</div>
-			<div class="clearer"></div>
 		</div>
-		<div id="footer">
-			<div class="left">
-				<a href="#">Website.com</a> | <a href="#top">Go to top</a>
+
+		<!-- footer-bottom starts -->
+		<div id="footer-bottom">
+			<div class="bottom-left">
+				<p>
+					&copy; 2011 <strong>Mehmet Ersin Bitirgen</strong>&nbsp; &nbsp;
+					&nbsp; Design by <a href="http://www.adviceship.com/">Mesoft</a>
+				</p>
 			</div>
-			<div class="right">
-				<a href="http://templates.arcsin.se/">Website template</a> by Arcsin
+
+			<div class="bottom-right">
+				<p></p>
 			</div>
-			<center>
-				Popular free web templates <a
-					href="http://www.websitetemplatesonline.com" target="_blank">at
-					www.WebsiteTemplatesOnline.com</a>. Impressive <a
-					href="http://www.flashtemplates.com/flash-templates/"
-					title="Flash Templates for Websites">Flash Templates for
-					Websites</a>.
-			</center>
-			<div class="clearer"></div>
+			<!-- footer-bottom ends -->
 		</div>
+
+		<!-- wrap ends here -->
 	</div>
+
 </body>
 </html>
 
