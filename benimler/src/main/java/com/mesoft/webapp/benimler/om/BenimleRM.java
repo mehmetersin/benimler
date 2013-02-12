@@ -16,6 +16,7 @@ public class BenimleRM implements RowMapper {
 		ms.setTitle(rs.getString("title"));
 		ms.setUrl(rs.getString("url"));
 		ms.setUserId(rs.getString("userId"));
+		ms.setTimestamp(rs.getTimestamp("timestamp"));
 		return ms;
 	}
 

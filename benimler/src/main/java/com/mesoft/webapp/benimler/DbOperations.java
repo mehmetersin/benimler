@@ -12,6 +12,8 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.FacebookProfile;
 
 import com.mesoft.webapp.benimler.om.Benimle;
 import com.mesoft.webapp.benimler.om.BenimleRM;
@@ -24,11 +26,15 @@ public class DbOperations {
 
 	private HashMap<Integer, Category> categoryList = null;
 
+	private List<Category> favoriteCategoryList = null;
+
 	private JdbcTemplate selectTemplate;
 
 	private SimpleJdbcInsert insertBenimle;
 
 	private SimpleJdbcInsert insertComment;
+
+	private static HashMap<String, FacebookProfile> profileCache = null;
 
 	public void setBenimlerDs(DataSource benimlerDs) {
 		selectTemplate = new JdbcTemplate(benimlerDs);
@@ -66,14 +72,27 @@ public class DbOperations {
 				new Object[] { id }, new CommentRM());
 	}
 
-	
-	
+	public static FacebookProfile getFacebookProfile(Facebook facebook,
+			String userId) {
+
+		if (profileCache == null) {
+			profileCache = new HashMap<String, FacebookProfile>();
+		}
+		FacebookProfile prof = profileCache.get(userId);
+
+		if (prof == null) {
+			prof = facebook.userOperations().getUserProfile(userId);
+			profileCache.put(userId, prof);
+		}
+		return prof;
+	}
+
 	public HashMap<Integer, Category> getCategoryList() {
-		
-		if (categoryList == null){
+
+		if (categoryList == null) {
 			loadCategoryList();
 		}
-		
+
 		return categoryList;
 	}
 
@@ -82,8 +101,7 @@ public class DbOperations {
 	}
 
 	public List<String> queryCategory(String name) {
-		
-		
+
 		List<String> matched = new ArrayList<String>();
 		for (Entry<Integer, Category> mapEntry : getCategoryList().entrySet()) {
 			Integer key = mapEntry.getKey();
@@ -102,6 +120,13 @@ public class DbOperations {
 			loadCategoryList();
 		}
 		return categoryList.get(id);
+	}
+	
+	public List<Category> getFavCategoryList(){
+		if (favoriteCategoryList == null){
+			loadCategoryList();
+		}
+		return favoriteCategoryList;
 	}
 
 	public Category getCategoryByDisplayname(String name) {
@@ -139,6 +164,7 @@ public class DbOperations {
 
 	public void loadCategoryList() {
 		categoryList = new HashMap<Integer, Category>();
+		favoriteCategoryList = new ArrayList<Category>();
 
 		List list = (java.util.List) selectTemplate
 				.query("SELECT d.id as detailCatId,d.name as detailCatName,m.name as mainCatName,m.id as mainCatId FROM detailcategory d,maincategory m where d.mainid=m.id",
@@ -146,6 +172,9 @@ public class DbOperations {
 		for (int i = 0; i < list.size(); i++) {
 			Category c = (Category) list.get(i);
 			categoryList.put(c.getDetailCategoryId(), c);
+			if (favoriteCategoryList.size() < 6) {
+				favoriteCategoryList.add(c);
+			}
 
 		}
 

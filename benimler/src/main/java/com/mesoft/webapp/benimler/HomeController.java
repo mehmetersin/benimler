@@ -15,7 +15,9 @@
  */
 package com.mesoft.webapp.benimler;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -67,7 +69,7 @@ public class HomeController {
 		this.dbOperations = dbOperations;
 	}
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "/", method = {RequestMethod.GET,RequestMethod.POST})
 	public String home(Model model,
 			@ModelAttribute("searchText") BenimleForm searchForm) {
 
@@ -78,20 +80,44 @@ public class HomeController {
 
 	private void createFavoriteBenimler(Model model, BenimleForm searchForm) {
 		List<Benimle> list = getDbOperations().qetFavoriteBenimler();
+		
+		List<Comment> favComments = new ArrayList<Comment>();
+		List<Benimle> favBenimle = new ArrayList<Benimle>();
+		
 		for (Benimle benimle : list) {
 			FacebookProfile prof = facebook.userOperations().getUserProfile(
 					benimle.getUserId());
 			benimle.setUser(prof);
 			benimle.setCategory(dbOperations.getCategoryById(benimle
 					.getCategoryId()));
-			benimle.setComments(dbOperations.qetCommentsByBenimleId(benimle
-					.getId()));
+			List<Comment> comments = dbOperations.qetCommentsByBenimleId(benimle
+					.getId());
+			
+			for (Iterator iterator = comments.iterator(); iterator.hasNext();) {
+				Comment comment = (Comment) iterator.next();
+				comment.setUsername(DbOperations.getFacebookProfile(facebook, comment.getUserId()).getName());
+				if (favComments.size()<6){
+					favComments.add(comment);
+				}
+			}
+			
+			benimle.setComments(comments);
+			
+			if (favBenimle.size()<6){
+				favBenimle.add(benimle);
+			}
+			
+			
 		}
 
-		
-		
 		model.addAttribute("benims", list);
-
+		
+		model.addAttribute("favCategoryList",dbOperations.getFavCategoryList());
+		
+		model.addAttribute("favCommentList",favComments);
+		model.addAttribute("favBenimle",favBenimle);
+		
+		
 		searchForm = new BenimleForm();
 		searchForm.setText("Ara birşeyler");
 		model.addAttribute(searchForm);
@@ -129,8 +155,11 @@ public class HomeController {
 		
 		dbOperations.insertComment(c);
 		
+		searchForm = new BenimleForm();
 		
 		createFavoriteBenimler(model, searchForm);
+		
+		
 		
 		return "home";
 	}
